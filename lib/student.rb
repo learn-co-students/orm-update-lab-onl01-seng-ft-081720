@@ -1,8 +1,7 @@
 require_relative "../config/environment.rb"
 
 class Student
-  attr_accessor :name, :grade
-  attr_reader :id
+  attr_accessor :name, :grade, :id
 
   # Remember, you can access your database connection anywhere in this class
   #  with DB[:conn]
@@ -26,11 +25,10 @@ class Student
   end
 
   def self.new_from_db(row)
-    new_student = self.new
     new_student.id = row[0]
     new_student.name = row[1]
     new_student.grade = row[2]
-    new_student
+    new_student = self.new(id, name, grade)
   end
 
   def self.find_by_name(name)
@@ -42,7 +40,7 @@ class Student
       SQL
 
     DB[:conn].execute(sql, name).map do |row|
-      self.new_from_db
+      self.new_from_db(row)
     end.first
   end
 
@@ -67,10 +65,9 @@ class Student
     end
   end
 
-  def self.create(name:, grade:)
-    new_student = self.new(name, grade)
+  def self.create(name, grade)
+    new_student = Student.new(name, grade)
     new_student.save
-    new_student
   end
 
   def update
